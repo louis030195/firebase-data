@@ -1,0 +1,10 @@
+# Service accounts
+*svc*
+
+# Python
+env
+*.egg*
+__pycache__
+
+# Exported data
+data/*.json
