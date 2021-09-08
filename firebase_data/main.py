@@ -5,7 +5,6 @@ import fire
 from firebase_admin import credentials, initialize_app, firestore
 from google.cloud.firestore_v1.base_client import BaseClient
 from google.cloud.firestore_v1 import DocumentReference
-import datetime
 
 def export_data(
     service_account_path,
@@ -24,25 +23,12 @@ def export_data(
                 docs[-1][1]['sub_collections'][sub_collection.id].append((sub_collection_doc.id, sub_collection_doc.to_dict()))
     with open(f'data/{collection}.json', 'w') as f:
         d = {'collection': []}
-        property_to_timestamp = -1
         for doc in docs:
-            # Hack to convert, if needed, DatetimeWithNanoseconds properties to timestamp
-            # Typically used in firebase and not JSON serializable
-            data = doc[1]
-            if property_to_timestamp != None and property_to_timestamp != -1:
-                data[property_to_timestamp] = data[property_to_timestamp].timestamp()
-            elif property_to_timestamp == -1:
-                for k, v in data.items():
-                    if issubclass(type(v), datetime.datetime):
-                        property_to_timestamp = k
-                        data[property_to_timestamp] = data[property_to_timestamp].timestamp()
-                if property_to_timestamp == -1:
-                    property_to_timestamp = None
             d['collection'].append({
                 'id': doc[0],
-                **data
+                **doc[1]
             })
-        json.dump(d, f, indent=4)
+        json.dump(d, f, indent=4, default=str)
 
 def import_data(
     service_account_path,

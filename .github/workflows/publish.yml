@@ -1,11 +1,11 @@
-# This workflows will upload a Python Package using Twine when a release is created
+# This workflows will upload a Python Package using Twine when a tag is pushed
 # For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
 
-name: Upload Python Package
-
+name: On tag pushed
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
   deploy:
@@ -29,3 +29,7 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
         twine upload dist/*
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_REPOSITORY: louis030195/firebase-data
