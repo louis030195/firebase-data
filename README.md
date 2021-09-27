@@ -5,37 +5,42 @@
 
 Easily transfer data between firebase projects.
 
+⚠️ This package is still in early development. Read the code before running (especially on production environments).
+
 ## Why another Firebase data management tool
 
 - Existing ones don't provide features to handle inter-project data management.
+- Official solution does not allow eu/us data movement
 
 ## Install
 
-pip install firebase-data
+`pip install firebase-data`
 
 ## Usage
 
 ### Export
 
 ```bash
-fdata export_data --service_account_path=./svc.dev.json --collection=foos
+fdata export --service_account_path=./svc.dev.json --collection=foos --output_path=./data
 ```
 
 ### Import
 
-```
-fdata import_data --service_account_path=./svc.prod.json --collection=foos
+```bash
+fdata import --service_account_path=./svc.prod.json --collection=foos --input_path=./data
 ```
 
 ## Warning
 
 - Not optimized for large collections (your PC will explose)
-- Only one collection depth, i.e. foos{fooId}/bars/{barId}
+- Only one collection depth, i.e. foos/{fooId}/bars/{barId}
 
 
 ## TODOS
 
 - [x] import/export (depth one)
+- [ ] use transations
+- [ ] parallelize/optimize
 - [ ] import+export as single call
 - [ ] clean/delete
 - [ ] other firebase data
