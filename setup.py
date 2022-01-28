@@ -9,7 +9,7 @@ if __name__ == "__main__":
         name = 'firebase-data',
         packages = find_packages(),
         include_package_data = True,
-        version = '1.0.2',
+        version = '1.0.3',
         license='MIT',
         description = 'Easily transfer data between firebase projects',
         long_description=long_description,

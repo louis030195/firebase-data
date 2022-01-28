@@ -1,17 +1,22 @@
-
 import os
 from tqdm import tqdm
 import json
 import fire
-from firebase_admin import credentials, initialize_app, firestore
+from firebase_admin import credentials, initialize_app, firestore, auth
 from google.cloud.firestore_v1.base_client import BaseClient
 from google.cloud.firestore_v1 import DocumentReference
 
 def export_data(
-    service_account_path,
-    collection,
-    output_path = './data',
+    service_account_path: str,
+    collection: str,
+    output_path: str = './data',
     ):
+    """
+    Export a collection and its data to a json file.
+    :param: service_account_path: path to the service account json file
+    :param: collection: name of the collection to export
+    :param: output_path: path to the output directory
+    """
     cred = credentials.Certificate(service_account_path)
     initialize_app(cred)
     f_c: BaseClient = firestore.client()
@@ -37,10 +42,16 @@ def export_data(
         json.dump(d, f, indent=4, default=str)
 
 def import_data(
-    service_account_path,
-    collection,
-    input_path = './data',
+    service_account_path: str,
+    collection: str,
+    input_path: str = './data',
     ):
+    """
+    Import a collection and its data from a json file.
+    :param: service_account_path: path to the service account json file
+    :param: collection: name of the collection to import
+    :param: input_path: path to the input directory
+    """
     cred = credentials.Certificate(service_account_path)
     initialize_app(cred)
     f_c: BaseClient = firestore.client()
@@ -57,11 +68,42 @@ def import_data(
                 for sub_collection_doc in collection_doc['sub_collections'][sub_collection]:
                     collection_doc_ref.collection(sub_collection).document(sub_collection_doc['id']).set(sub_collection_doc)
 
+def export_auth(
+    service_account_path: str,
+    output_path: str = './data',
+    ):
+    """
+    Export all users and their data to a json file.
+    :param: service_account_path: path to the service account json file
+    :param: output_path: path to the output directory
+    """
+    cred = credentials.Certificate(service_account_path)
+    initialize_app(cred)
+    docs = []
+    for doc in tqdm(auth.list_users().iterate_all()):
+        docs.append(vars(doc))
+    # Create dir if not exist
+    os.makedirs(f'{output_path}', exist_ok=True)
+    with open(f'{output_path}/users.json', 'w') as f:
+        json.dump(docs, f, indent=4)
+
+def import_auth(
+    service_account_path: str,
+    input_path: str = './data',
+    ):
+    """
+    Import all users and their data from a json file.
+    :param: service_account_path: path to the service account json file
+    :param: input_path: path to the input directory
+    """
+    raise NotImplementedError
 
 def main():
     fire.Fire({
         'export': export_data,
         'import': import_data,
+        'auth:export': export_auth,
+        'auth:import': import_auth,
     })
 
 if __name__ == '__main__':

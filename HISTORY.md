@@ -1,3 +1,7 @@
+## 1.0.3
+
+* export Firebase Authentication
+
 ## 1.0.1
 
 * fixed Firestore timestamp serialization

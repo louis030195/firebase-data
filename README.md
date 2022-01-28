@@ -38,8 +38,9 @@ fdata import --service_account_path=./svc.prod.json --collection=foos --input_pa
 
 ## TODOS
 
-- [x] import/export (depth one)
-- [ ] use transations
+- [x] import/export Firestore (depth one)
+- [x] export Firebase authentication
+- [ ] use transactions
 - [ ] parallelize/optimize
 - [ ] import+export as single call
 - [ ] clean/delete
