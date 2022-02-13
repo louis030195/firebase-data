@@ -8,3 +8,9 @@ __pycache__
 
 # Exported data
 data/*.json
+
+# Firebase
+.firebaserc
+firebase.json
+firestore.indexes.json
+firestore.rules

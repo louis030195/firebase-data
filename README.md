@@ -18,16 +18,32 @@ Easily transfer data between firebase projects.
 
 ## Usage
 
-### Export
+### Export collection
 
 ```bash
 fdata export --service_account_path=./svc.dev.json --collection=foos --output_path=./data
 ```
 
-### Import
+### Import collection
 
 ```bash
 fdata import --service_account_path=./svc.prod.json --collection=foos --input_path=./data
+```
+
+### Export authentication
+
+```bash
+fdata auth:export --service_account_path=./svc.dev.json --output_path=./data
+```
+
+### Delete
+
+No need to reinvent the wheel here, use firebase-cli.
+
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS=./svc.dev.json
+firebase use my-project
+firebase firestore:delete foos --recursive
 ```
 
 ## Warning
@@ -40,13 +56,21 @@ fdata import --service_account_path=./svc.prod.json --collection=foos --input_pa
 
 - [x] import/export Firestore (depth one)
 - [x] export Firebase authentication
+- [x] delete Firebase collection
+- [ ] import Firebase authentication
 - [ ] use transactions
 - [ ] parallelize/optimize
 - [ ] import+export as single call
-- [ ] clean/delete
 - [ ] other firebase data
 
 ## Development
+
+### Install
+
+```bash
+firebase login
+firebase init
+```
 
 ### How to release
 
