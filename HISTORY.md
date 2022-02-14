@@ -1,3 +1,7 @@
+## 1.0.5
+
+* setup logging, ask user confirmation before importing
+
 ## 1.0.4
 
 * documentation for deleting a collection, improved overall documentation

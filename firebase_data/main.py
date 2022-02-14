@@ -7,9 +7,7 @@ from firebase_admin import credentials, initialize_app, firestore, auth
 from google.cloud.firestore_v1.base_client import BaseClient
 from google.cloud.firestore_v1 import DocumentReference
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 def export_data(
     service_account_path: str, collection: str, output_path: str = "./data",
@@ -25,6 +23,7 @@ def export_data(
     f_c: BaseClient = firestore.client()
     docs = []
     # TODO: parallel batches
+    logging.info(f"exporting {collection}")
     for doc in tqdm(f_c.collection(collection).stream()):
         docs.append((doc.id, doc.to_dict()))
         d: DocumentReference = doc.reference
@@ -42,7 +41,7 @@ def export_data(
             d["collection"].append({"id": doc[0], **doc[1]})
         # default=str is used to serialize Firebase timestamps
         json.dump(d, f, indent=4, default=str)
-    logger.info(f"{collection} exported")
+    logging.info(f"{collection} exported")
 
 
 def import_data(
@@ -50,6 +49,7 @@ def import_data(
     collection: str,
     input_path: str = "./data",
     merge: bool = False,
+    yes: bool = False,
 ):
     """
     Import a collection and its data from a json file.
@@ -57,6 +57,7 @@ def import_data(
     :param: collection: name of the collection to import
     :param: input_path: path to the input directory
     :param: merge: if True, merge the data with the existing data, otherwise replace it
+    :param: yes: if True, don't ask for confirmation
     """
     cred = credentials.Certificate(service_account_path)
     initialize_app(cred)
@@ -64,6 +65,15 @@ def import_data(
     with open(f"{input_path}/{collection}.json", "r") as f:
         d = json.load(f)
         # TODO: parallel batches
+        # ask user confirmation to import into this collection
+        if (
+            not yes and
+            input(f"About to import {len(d['collection'])} documents into {collection}."
+            +f"Project: {d['project_id']}. Are you sure? (y/n) ") != "y"
+            ):
+            logging.info("aborting import")
+            return
+
         for collection_doc in tqdm(d["collection"]):
             collection_doc_ref = f_c.collection(collection).document(
                 collection_doc["id"]
@@ -80,7 +90,7 @@ def import_data(
                     collection_doc_ref.collection(sub_collection).document(
                         sub_collection_doc["id"]
                     ).set(sub_collection_doc, merge=merge)
-    logger.info(f"{collection} imported")
+    logging.info(f"{collection} imported")
 
 
 def export_auth(
@@ -100,7 +110,7 @@ def export_auth(
     os.makedirs(f"{output_path}", exist_ok=True)
     with open(f"{output_path}/users.json", "w") as f:
         json.dump(docs, f, indent=4)
-    logger.info("users exported")
+    logging.info("users exported")
 
 
 def import_auth(
